@@ -1,0 +1,14 @@
+*.pyc
+__pycache__/
+
+.pytest_cache/
+.coverage
+.coveragerc
+htmlcov/
+
+dist/
+.vscode
+build/
+
+Notes
+ToDo
