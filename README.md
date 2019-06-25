@@ -2,7 +2,7 @@
 
 > Standard game of blackjack with 1 deck and up to 6 players.
 
-![](https://github.com/jacksonx9/Blackjack/photos/blackjack_play_game_example)
+![](https://github.com/jacksonx9/Blackjack/blob/master/photos/blackjack_play_game_example)
 
 #### Run Game
 
