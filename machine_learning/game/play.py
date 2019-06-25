@@ -1,17 +1,5 @@
 from blackjack.game.game import Game
-from blackjack.person.person import PLAYER_COLORS
 
-MAX_PLAYERS = len(PLAYER_COLORS)
-
-def clear_screen():
-    '''Clear the screen for better view'''
-    print('\033[H\033[J')
-
-def continue_prompt():
-    '''Clear the screen before starting a new round'''
-    print()
-    input('Hit enter to continue - ctrl-c to exit: ')
-    clear_screen()
 
 def get_response(question, accepted, default):
     '''Get input that matches the accepted answers'''
@@ -25,15 +13,16 @@ def get_response(question, accepted, default):
 
 def start_game():
     '''Obtain player names and starting chips'''
+    number_players = 6
     while True:
-        prompt = 'Enter up to {} player names or return for single player game: '
-        names = input(prompt.format(MAX_PLAYERS))
+        prompt = 'Enter up to 6 player names or return for single player game: '
+        names = input(prompt.format(number_players))
         if names == '':
             names = ['Player']
         else:
             names = names.split(' ')
-        if len(names) > MAX_PLAYERS:
-            print('Maximum of {} players only please!'.format(MAX_PLAYERS))
+        if len(names) > number_players:
+            print('Maximum of 6 players only please!'.format(number_players))
         else:
             break
 
@@ -47,25 +36,11 @@ def start_game():
 
 def main():
     '''Run the main game loop'''
-    clear_screen()
-    print('''
-          Welcome to Blackjack!
-          ---------------------
-This is the gambling game also known as 21
-where you and others can play against the
-computer dealer.
-There is one 52 pack of cards in the deck
-and the rules are documented here*. Purely
-for fun, the game tracks your results and
-and reports them at the conclusion.
-* https://en.wikipedia.org/wiki/Blackjack
-    ''')
     try:
         print()
         game = start_game()
 
         while True:
-            continue_prompt()
             if not game.players_with_chips(10):
                 print('No one with any chips remaining - game over')
                 break

@@ -11,9 +11,8 @@ python play_game/play.py
 #### Game Cycle
 Collect names of players and their starting chip balance then cycle through game process:
 1. deal initial cards
-2. offer insurance if dealer up card is A
-3. check dealer blackjack
-4. for each player’s hand:
+2. check dealer blackjack
+3. for each player’s hand:
    1. offer split, double down, hit or stand if possible
    2. if player busts, mark as finished and move to next
    3. then dealer plays until busts or stands

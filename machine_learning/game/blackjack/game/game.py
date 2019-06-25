@@ -1,8 +1,6 @@
 import random
 import time
-from termcolor import colored
 
-from ..person.person import PLAYER_COLORS
 from ..person import Player
 from ..hand.hand import Hand
 from ..deck.deck import Deck
@@ -14,42 +12,32 @@ class Game():
     def __init__(self, names, chips):
         self.deck = Deck()
         self.deck.shuffle()
-        self.colors = list(PLAYER_COLORS)
-        self.players = list(Player(name, chips, self.__get_color()) 
+        self.players = list(Player(name, chips) 
             for name in names)
         self.max_name_len = max(max(len(name) for name in names), len('Dealer'))
         self.playing = False
         self.dealer = None
 
-    def __get_color(self):
-        '''Obtain a random color from available termcolors.'''
-        assert self.colors
-        colors = self.colors
-        color = random.choice(colors)
-        colors.remove(color)
-        return color
-
-    def _deal_card(self, name, hand, color='white', announce=True):
+    def _deal_card(self, name, hand, announce=True):
         '''Take the next available card from deck and add to hand.'''
         card = self.deck.next_card()
         hand.add_card(card)
         if announce:
             time.sleep(1)
             prompt = 'dealt {}  {:>2} : {}'.format(card, hand.value(), hand)
-            print(self.format_text(name, prompt, color))
+            print(self.format_text(name, prompt))
 
     def _get_bet(self, player, question, minimum, multiple):
         '''Ask player for their bet and check constraints on answer.'''
         print()
-        print(self.format_text(player.name, question.lower(), player.color))
+        print(self.format_text(player.name, question.lower()))
         prompt = '{} available, {} minimum, multiples of {} only'.format(
             player.chips, minimum, multiple)
-        print(self.format_text(player.name, prompt, player.color))
+        print(self.format_text(player.name, prompt))
         bet = -1
         while bet < minimum or bet > player.chips or bet % multiple != 0:
             bet = input(self.format_text(
-                player.name, 'enter amount ({}): '.format(minimum),
-                    player.color))
+                player.name, 'enter amount ({}): '.format(minimum)))
             if bet == '':
                 bet = minimum
             else:
@@ -59,10 +47,10 @@ class Game():
                     pass
         return bet
 
-    def format_text(self, name, text, color='white'):
-        '''Prefix output with player's name and colorize'''
+    def format_text(self, name, text):
+        '''Prefix output with player's name.'''
         name = name.rjust(self.max_name_len)
-        return colored('{} > {}'.format(name, text), color)
+        return '{} > {}'.format(name, text)
 
     def players_with_chips(self, min=1):
         '''Returns a list of players with chips remaining'''
@@ -106,7 +94,7 @@ class Game():
         for player in players:
             hand = player.hands[0]
             prompt = 'hand dealt {:>2} : {}'.format(hand.value(), hand)
-            print(self.format_text(player.name, prompt, player.color))
+            print(self.format_text(player.name, prompt))
         print(self.format_text('Dealer', 'face up card  : {}'.format(dealer.cards[0])))
         self.dealer = dealer
 
@@ -124,7 +112,7 @@ class Game():
                     if hand.value() == dealer.value():
                         outcome = 'you scored blackjack as well.'
                         player.push(hand.stake)
-                        print(self.format_text(player.name, outcome, player.color))
+                        print(self.format_text(player.name, outcome))
 
     def check_for_player_blackjack(self):
         '''Check if any player has blackjack and settle bets accordingly'''
@@ -133,8 +121,7 @@ class Game():
         for player in players:
             for hand in player.active_hands():
                 if hand.blackjack():
-                    print(self.format_text(player.name, 'you scored blackjack!',
-                        player.color))
+                    print(self.format_text(player.name, 'you scored blackjack!'))
                     self.settle_outcome(dealer, player, hand)
 
     def settle_outcome(self, dealer, player, hand):
@@ -153,29 +140,29 @@ class Game():
         else:
             outcome = 'you lost to the dealer :('
             player.loss()
-        print(self.format_text(player.name, outcome, player.color))
+        print(self.format_text(player.name, outcome))
 
     def split_hand(self, player, hand):
         '''Split player's hand if possible'''
         if hand.pair() and player.has_chips(hand.stake):
             prompt = 'would you like to split your pair? (Y/n): '
-            prompt = self.format_text(player.name, prompt, player.color)
+            prompt = self.format_text(player.name, prompt)
             resp = self.get_response(prompt, ('Y', 'N'), 'Y')
             if resp == 'Y':
                 new_hand = hand.split()
                 player.bet(hand.stake)
-                self._deal_card(player.name, hand, player.color)
-                self._deal_card(player.name, new_hand, player.color)
+                self._deal_card(player.name, hand)
+                self._deal_card(player.name, new_hand)
                 player.hands.append(new_hand)
-                self.show_hand(player.name, hand, player.color)
+                self.show_hand(player.name, hand)
 
     def hit(self, player, hand):
         '''Draw another card for player and determine outcome.'''
-        self._deal_card(player.name, hand, player.color)
+        self._deal_card(player.name, hand)
 
     def bust(self, player, hand):
         '''Handle a player's hand that has busted.'''
-        print(self.format_text(player.name, 'busted! :(', player.color))
+        print(self.format_text(player.name, 'busted! :('))
         player.loss()
         hand.active = False
 
@@ -183,7 +170,7 @@ class Game():
         '''Player wishes to double their bet and receive one more card.'''
         player.bet(hand.stake)
         hand.stake += hand.stake
-        self._deal_card(player.name, hand, player.color)
+        self._deal_card(player.name, hand)
         if hand.bust():
             self.bust(player, hand)
 
@@ -216,13 +203,13 @@ class Game():
             results = ',  '.join('{}: {:>2}'.format(k, v) for k, v in 
                 player.results.items())
             prompt = 'chips: {:>3},  {}'.format(player.chips, results)
-            print(self.format_text(player.name, prompt, player.color))
+            print(self.format_text(player.name, prompt))
 
-    def show_hand(self, name, hand, color='white'):
+    def show_hand(self, name, hand):
         '''Print player's current hand'''
         print()
         prompt = 'hand value {:>2} : {}'.format(hand.value(), hand)
-        print(self.format_text(name, prompt, color))
+        print(self.format_text(name, prompt))
 
     def play_hands(self):
         '''Play any active hands until completed'''
@@ -235,14 +222,13 @@ class Game():
 
     def play_hand(self, player, hand):
         '''Play the hand until finished'''
-        self.show_hand(player.name, hand, player.color)
+        self.show_hand(player.name, hand)
         if player.can_split(hand):
             self.split_hand(player, hand)
 
         while hand.active:
             if hand.twenty_one():
-                print(self.format_text(player.name, 'scored 21! :)',
-                    player.color))
+                print(self.format_text(player.name, 'scored 21! :)'))
                 break
             if hand.bust():
                 self.bust(player, hand)
@@ -254,7 +240,7 @@ class Game():
                 question = 'would you like to hit or stand? (H/s): '
                 answers = ('H', 'S')
 
-            prompt = self.format_text(player.name, question, player.color)
+            prompt = self.format_text(player.name, question)
             resp = self.get_response(prompt, answers, default='H')
             if resp == 'H':
                 if self.hit(player, hand):
