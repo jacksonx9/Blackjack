@@ -3,9 +3,11 @@ from blackjack.person.person import PLAYER_COLORS
 
 MAX_PLAYERS = len(PLAYER_COLORS)
 
+
 def clear_screen():
     '''Clear the screen for better view'''
     print('\033[H\033[J')
+
 
 def continue_prompt():
     '''Clear the screen before starting a new round'''
@@ -13,15 +15,6 @@ def continue_prompt():
     input('Hit enter to continue - ctrl-c to exit: ')
     clear_screen()
 
-def get_response(question, accepted, default):
-    '''Get input that matches the accepted answers'''
-    while True:
-        resp = input(question).upper()
-        if resp == '':
-            resp = default
-        if resp in accepted:
-            break
-    return resp
 
 def start_game():
     '''Obtain player names and starting chips'''
@@ -44,6 +37,7 @@ def start_game():
     else:
         chips = int(chips)
     return Game(names, chips)
+
 
 def main():
     '''Run the main game loop'''

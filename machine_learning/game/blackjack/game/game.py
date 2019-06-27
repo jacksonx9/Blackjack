@@ -1,21 +1,20 @@
 import random
 import time
 
-from ..person import Player
-from ..hand.hand import Hand
-from ..deck.deck import Deck
+from .. import Player, BotPlayer, Hand, Deck
 
 
 class Game():
     '''Controls the actions of the game'''
 
-    def __init__(self, names, chips):
+    def __init__(self, name, chips):
         self.deck = Deck()
         self.deck.shuffle()
-        self.players = list(Player(name, chips) for name in names)
-        self.max_name_len = max(max(len(name) for name in names),
-                                len('Dealer'))
+        self.player = Player(name, chips)
+        self.max_name_len = max(len(name), len('Dealer'))  # remove
         self.playing = False
+        self.bot_players = list(BotPlayer(name) for name in ['Bot1', 'Bot2',
+                                'Bot3', 'Bot4', 'Bot5'])
         self.dealer = None
 
     def _deal_card(self, name, hand, announce=True):
@@ -27,17 +26,18 @@ class Game():
             prompt = 'dealt {}  {:>2} : {}'.format(card, hand.value(), hand)
             print(self.format_text(name, prompt))
 
-    def _get_bet(self, player, question, minimum, multiple):
+    def _get_bet(self, minimum, multiple):
         '''Ask player for their bet and check constraints on answer.'''
+        question = 'How much would you like to bet?'
         print()
-        print(self.format_text(player.name, question.lower()))
+        print(self.format_text(self.player.name, question.lower()))
         prompt = '{} available, {} minimum, multiples of {} only'.format(
-            player.chips, minimum, multiple)
-        print(self.format_text(player.name, prompt))
+            self.player.chips, minimum, multiple)
+        print(self.format_text(self.player.name, prompt))
         bet = -1
-        while bet < minimum or bet > player.chips or bet % multiple != 0:
+        while bet < minimum or bet > self.player.chips or bet % multiple != 0:
             bet = input(self.format_text(
-                player.name, 'enter amount ({}): '.format(minimum)))
+                self.player.name, 'enter amount ({}): '.format(minimum)))
             if bet == '':
                 bet = minimum
             else:
@@ -49,95 +49,68 @@ class Game():
 
     def format_text(self, name, text):
         '''Prefix output with player's name.'''
+        print(name)
         name = name.rjust(self.max_name_len)
         return '{} > {}'.format(name, text)
 
-    def players_with_chips(self, min=1):
-        '''Returns a list of players with chips remaining'''
-        return list(p for p in self.players if p.has_chips(min))
-
-    def active_players(self):
-        '''Generator of layers with active hands'''
-        for player in self.players:
-            if player.has_active_hands():
-                yield player
-
-    def has_active_hands(self):
-        '''Are there any active hands remaining?'''
-        return list(p for p in self.players if p.has_active_hands())
-
     def setup(self):
         '''Obtain bets and deal two cards to the player and the dealer.'''
-        hands = []
         self.playing = True
         min_bet = 10
-        random.shuffle(self.players)  # change to ai_players first then player
-        players = self.players_with_chips(min_bet)
-        if not players:
+
+        if not self.player.has_chips(min_bet):
             return
 
-        for player in players:
-            bet = self._get_bet(player, 'How much would you like to bet?',
-                                min_bet, 2)
-            hand = Hand(bet)
-            hands.append(hand)
-            player.bet(bet)
-            player.hands = [hand]
+        bet = self._get_bet(min_bet, 2)
+        self.player.bet(bet)
+        self.player.hands = [Hand(bet)]
 
         self.dealer = Hand(0)
         for _ in range(2):
-            for hand in hands:
-                self._deal_card(_, hand, announce=False)
+            for bot in self.bot_players:
+                bot.hand = Hand(0)
+                self._deal_card(_, bot.hand, announce=False)
             self._deal_card(_, self.dealer, announce=False)
+            self._deal_card(_, self.player.hands[0], announce=False)
         print()
-        for player in players:
-            hand = player.hands[0]
-            prompt = 'hand dealt {:>2} : {}'.format(hand.value(), hand)
-            print(self.format_text(player.name, prompt))
+        for bot in self.bot_players:
+            prompt = 'hand dealt {:>2} : {}'.format(bot.hand.value(), bot.hand)
+            print(self.format_text(bot.name, prompt))
+        player_hand = self.player.hands[0]
+        print(self.format_text(self.player.name, 'hand dealt {:>2} : {}'
+                               .format(player_hand.value(), player_hand)))
         print(self.format_text('Dealer', 'face up card  : {}'
                                .format(self.dealer.cards[0])))
 
-    def check_for_dealer_blackjack(self):
-        '''Check if dealer has blackjack and settle bets accordingly'''
-        players = self.active_players()
+    def check_for_blackjack(self):
+        '''Check if blackjack and settle bets accordingly'''
         if self.dealer.blackjack():
             self.playing = False
             print()
             print(self.format_text('Dealer', 'scored blackjack : {}'
                   .format(self.dealer)))
-            for player in players:
-                for hand in player.active_hands():
-                    if hand.value() == self.dealer.value():
-                        outcome = 'you scored blackjack as well.'
-                        player.push(hand.stake)
-                        print(self.format_text(player.name, outcome))
+            if self.player.hands[0].value() == self.dealer.value():
+                outcome = 'you scored blackjack as well.'
+                player.push(self.player.hands[0].stake)
+                print(self.format_text(player.name, outcome))
+                return
 
-    def check_for_player_blackjack(self):
-        '''Check if any player has blackjack and settle bets accordingly'''
-        players = self.active_players()
-        for player in players:
-            for hand in player.active_hands():
-                if hand.blackjack():
-                    print(self.format_text(player.name, 'blackjack!'))
-                    self.settle_outcome(self.dealer, player, hand)
+        if self.player.hands[0].blackjack():
+            print(self.format_text(self.player.name, 'blackjack!'))
+            self.settle_outcome(self.player.hands[0])
 
-    def settle_outcome(self, dealer, player, hand):
+    def settle_outcome(self, hand):
         '''Decide the outcome of the player's hand compared to the dealer'''
         hand.active = False
         if hand.value() > self.dealer.value() or self.dealer.bust():
             outcome = 'you beat the dealer! :)'
-            if hand.blackjack():
-                odds = 1.5
-            else:
-                odds = 1
-            player.win(hand.stake, odds)
+            self.player.win(hand.stake, 1)
         elif hand.value() == self.dealer.value():
             outcome = 'you tied with the dealer :|'
-            player.push(hand.stake)
+            self.player.push(hand.stake)
         else:
             outcome = 'you lost to the dealer :('
-            player.loss()
-        print(self.format_text(player.name, outcome))
+        print(self.format_text(self.player.name, outcome))
 
     def split_hand(self, player, hand):
         '''Split player's hand if possible'''
@@ -160,16 +133,7 @@ class Game():
     def bust(self, player, hand):
         '''Handle a player's hand that has busted.'''
         print(self.format_text(player.name, 'busted! :('))
-        player.loss()
         hand.active = False
-
-    def double_down(self, player, hand):
-        '''Player wishes to double their bet and receive one more card.'''
-        player.bet(hand.stake)
-        hand.stake += hand.stake
-        self._deal_card(player.name, hand)
-        if hand.bust():
-            self.bust(player, hand)
 
     def dealer_turn(self):
         '''Controls dealer's turn and the outcome of the game.'''
@@ -183,23 +147,23 @@ class Game():
             self._deal_card('Dealer', self.dealer)
         if self.dealer.bust():
             print(self.format_text('Dealer', 'busted!'))
-        for player in self.active_players():
-            for hand in player.active_hands():
-                self.settle_outcome(self.dealer, player, hand)
+        for hand in self.player.active_hands():
+            self.settle_outcome(hand)
 
-    def results(self):
-        '''Print player statistics'''
-        print()
-        players = sorted(self.players,
-                         reverse=True,
-                         key=lambda x: (x.chips,
-                                        x.results['wins']*3 + x.results['ties'],
-                                        -x.results['losses']))
-        for player in players:
-            results = ',  '.join('{}: {:>2}'.format(k, v) for k, v in
-                                 player.results.items())
-            prompt = 'chips: {:>3},  {}'.format(player.chips, results)
-            print(self.format_text(player.name, prompt))
+    def bots_turn(self):
+        '''Controls bots' turn.'''
+        for bot in self.bot_players:
+            print()
+            prompt = 'turns {}  {:>2} : {}'.format(
+                bot.hand.cards[-1],
+                bot.hand.value(),
+                bot.hand)
+            print(self.format_text(bot.name, prompt))
+            while bot.hand.value() < 17:
+                self._deal_card(bot.name, bot.hand)
+            if bot.hand.bust():
+                print(self.format_text(bot.name, 'busted!'))
+            self.show_hand(bot.name, bot.hand)
 
     def show_hand(self, name, hand):
         '''Print player's current hand'''
@@ -210,41 +174,35 @@ class Game():
     def play_hands(self):
         '''Play any active hands until completed'''
         if self.playing:
-            for player in self.active_players():
-                for hand in player.active_hands():
-                    self.play_hand(player, hand)
-            if self.has_active_hands():
+            self.bots_turn()
+            for hand in self.player.active_hands():
+                self.play_hand(hand)
+            if self.player.has_active_hands():
                 self.dealer_turn()
 
-    def play_hand(self, player, hand):
+    def play_hand(self, hand):
         '''Play the hand until finished'''
-        self.show_hand(player.name, hand)
-        if player.can_split(hand):
-            self.split_hand(player, hand)
+        self.show_hand(self.player.name, hand)
+        if self.player.can_split(hand):
+            self.split_hand(self.player, hand)
 
         while hand.active:
             if hand.twenty_one():
-                print(self.format_text(player.name, 'scored 21! :)'))
+                print(self.format_text(self.player.name, 'scored 21! :)'))
                 break
             if hand.bust():
-                self.bust(player, hand)
+                self.bust(self.player, hand)
                 break
-            if player.can_double_down(hand):
-                question = 'would you like to hit, stand or double down? (H/s/d): '
-                answers = ('H', 'S', 'D')
             else:
                 question = 'would you like to hit or stand? (H/s): '
                 answers = ('H', 'S')
 
-            prompt = self.format_text(player.name, question)
+            prompt = self.format_text(self.player.name, question)
             resp = self.get_response(prompt, answers, default='H')
             if resp == 'H':
-                if self.hit(player, hand):
+                if self.hit(self.player, hand):
                     break
             elif resp == 'S':
-                break
-            elif resp == 'D':
-                self.double_down(player, hand)
                 break
             else:
                 # should never get here!
