@@ -12,9 +12,9 @@ class Game():
     def __init__(self, names, chips):
         self.deck = Deck()
         self.deck.shuffle()
-        self.players = list(Player(name, chips) 
-            for name in names)
-        self.max_name_len = max(max(len(name) for name in names), len('Dealer'))
+        self.players = list(Player(name, chips) for name in names)
+        self.max_name_len = max(max(len(name) for name in names),
+                                len('Dealer'))
         self.playing = False
         self.dealer = None
 
@@ -71,70 +71,67 @@ class Game():
         hands = []
         self.playing = True
         min_bet = 10
-        random.shuffle(self.players) # change to ai_players first then player
+        random.shuffle(self.players)  # change to ai_players first then player
         players = self.players_with_chips(min_bet)
         if not players:
             return
 
         for player in players:
-            player.insurance = 0
             bet = self._get_bet(player, 'How much would you like to bet?',
-                min_bet, 2)
+                                min_bet, 2)
             hand = Hand(bet)
             hands.append(hand)
             player.bet(bet)
             player.hands = [hand]
 
-        dealer = Hand(0)
+        self.dealer = Hand(0)
         for _ in range(2):
             for hand in hands:
                 self._deal_card(_, hand, announce=False)
-            self._deal_card(_, dealer, announce=False)
+            self._deal_card(_, self.dealer, announce=False)
         print()
         for player in players:
             hand = player.hands[0]
             prompt = 'hand dealt {:>2} : {}'.format(hand.value(), hand)
             print(self.format_text(player.name, prompt))
-        print(self.format_text('Dealer', 'face up card  : {}'.format(dealer.cards[0])))
-        self.dealer = dealer
+        print(self.format_text('Dealer', 'face up card  : {}'
+                               .format(self.dealer.cards[0])))
 
     def check_for_dealer_blackjack(self):
         '''Check if dealer has blackjack and settle bets accordingly'''
-        dealer = self.dealer
         players = self.active_players()
-        if dealer.blackjack():
+        if self.dealer.blackjack():
             self.playing = False
             print()
             print(self.format_text('Dealer', 'scored blackjack : {}'
-                .format(dealer)))
+                  .format(self.dealer)))
             for player in players:
                 for hand in player.active_hands():
-                    if hand.value() == dealer.value():
+                    if hand.value() == self.dealer.value():
                         outcome = 'you scored blackjack as well.'
                         player.push(hand.stake)
                         print(self.format_text(player.name, outcome))
 
     def check_for_player_blackjack(self):
         '''Check if any player has blackjack and settle bets accordingly'''
-        dealer = self.dealer
         players = self.active_players()
         for player in players:
             for hand in player.active_hands():
                 if hand.blackjack():
-                    print(self.format_text(player.name, 'you scored blackjack!'))
-                    self.settle_outcome(dealer, player, hand)
+                    print(self.format_text(player.name, 'blackjack!'))
+                    self.settle_outcome(self.dealer, player, hand)
 
     def settle_outcome(self, dealer, player, hand):
         '''Decide the outcome of the player's hand compared to the dealer'''
         hand.active = False
-        if hand.value() > dealer.value() or dealer.bust():
+        if hand.value() > self.dealer.value() or self.dealer.bust():
             outcome = 'you beat the dealer! :)'
             if hand.blackjack():
                 odds = 1.5
             else:
                 odds = 1
             player.win(hand.stake, odds)
-        elif hand.value() == dealer.value():
+        elif hand.value() == self.dealer.value():
             outcome = 'you tied with the dealer :|'
             player.push(hand.stake)
         else:
@@ -176,20 +173,19 @@ class Game():
 
     def dealer_turn(self):
         '''Controls dealer's turn and the outcome of the game.'''
-        dealer = self.dealer
         print()
         prompt = 'turns {}  {:>2} : {}'.format(
-            dealer.cards[-1],
-            dealer.value(),
-            dealer)
+            self.dealer.cards[-1],
+            self.dealer.value(),
+            self.dealer)
         print(self.format_text('Dealer', prompt))
-        while dealer.value() < 17:
-            self._deal_card('Dealer', dealer)
-        if dealer.bust():
+        while self.dealer.value() < 17:
+            self._deal_card('Dealer', self.dealer)
+        if self.dealer.bust():
             print(self.format_text('Dealer', 'busted!'))
         for player in self.active_players():
             for hand in player.active_hands():
-                self.settle_outcome(dealer, player, hand)
+                self.settle_outcome(self.dealer, player, hand)
 
     def results(self):
         '''Print player statistics'''
@@ -200,8 +196,8 @@ class Game():
                                         x.results['wins']*3 + x.results['ties'],
                                         -x.results['losses']))
         for player in players:
-            results = ',  '.join('{}: {:>2}'.format(k, v) for k, v in 
-                player.results.items())
+            results = ',  '.join('{}: {:>2}'.format(k, v) for k, v in
+                                 player.results.items())
             prompt = 'chips: {:>3},  {}'.format(player.chips, results)
             print(self.format_text(player.name, prompt))
 

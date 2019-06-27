@@ -11,6 +11,7 @@ def get_response(question, accepted, default):
             break
     return resp
 
+
 def start_game():
     '''Obtain player names and starting chips'''
     number_players = 6
@@ -33,6 +34,7 @@ def start_game():
     else:
         chips = int(chips)
     return Game(names, chips)
+
 
 def main():
     '''Run the main game loop'''
@@ -59,7 +61,6 @@ def main():
         print()
         print('Thanks for playing.')
         print()
-
 
 if __name__ == '__main__':
     main()

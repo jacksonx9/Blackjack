@@ -1,7 +1,7 @@
 class Person():
     '''Represents a player or the dealer in the game'''
 
-    def __init__(self, name):        
+    def __init__(self, name):       
         self.name = name
         self.hands = []
         self.results = {'wins': 0, 'ties': 0, 'losses': 0}
