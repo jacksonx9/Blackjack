@@ -104,7 +104,7 @@ class Game():
         hand.active = False
         if hand.value() > self.dealer.value() or self.dealer.bust():
             outcome = 'you beat the dealer! :)'
-            self.player.win(hand.stake, 1)
+            self.player.win(hand.stake)
         elif hand.value() == self.dealer.value():
             outcome = 'you tied with the dealer :|'
             self.player.push(hand.stake)

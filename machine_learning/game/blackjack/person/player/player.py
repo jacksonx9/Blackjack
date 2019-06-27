@@ -7,11 +7,11 @@ class Player(Person):
         self.chips = chips
         Person.__init__(self, name)
 
-    def win(self, bet, odds=1):
+    def win(self, bet):
         '''Player wins at the odds provided'''
         assert bet > 0
         assert odds >= 1
-        self.chips += int(bet * (odds + 1))
+        self.chips += int(bet) * 2
 
     def push(self, bet):
         '''When there is a draw.'''
