@@ -1,14 +1,14 @@
 import random, copy
 
-from ..card.card import Card, RANK, SUIT
+from ..card.card import Card, RANK
 
 
-class Deck(): 
+class Deck():
     '''Represents deck of 52 cards to be dealt to the player and dealer.'''
 
     def __init__(self):
-        self._cards = [Card(rank, suit) for suit in SUIT for rank in RANK]
-    
+        self._cards = [Card(rank) for rank in RANK] * 4
+
     def __len__(self):
         return len(self._cards)
 

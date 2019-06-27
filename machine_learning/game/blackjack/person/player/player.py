@@ -13,8 +13,8 @@ class Player(Person):
         assert odds >= 1
         self.chips += int(bet * (odds + 1))
 
-    def push(self, bet):  # TODO: When is a bet preserved????????/
-        '''Player bet is preserved'''
+    def push(self, bet):
+        '''When there is a draw.'''
         assert bet > 0
         self.chips += bet
 

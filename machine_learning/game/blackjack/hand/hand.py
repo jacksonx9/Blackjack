@@ -6,11 +6,12 @@ class Hand():
 
     def __repr__(self):
         class_name = type(self).__name__
-        return '{}('.format(class_name) + ','.join(str(card) for card in self.cards) + ')'
+        return '{}('.format(class_name) + ','.join(str(card) for card in
+                                                   self.cards) + ')'
 
     def __str__(self):
         return ','.join(str(card) for card in self.cards)
-    
+
     def __len__(self):
         return len(self.cards)
 
