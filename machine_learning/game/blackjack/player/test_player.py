@@ -4,6 +4,7 @@ from .. import Card
 from .. import Hand
 from .player import Player
 
+
 class PlayerTest(TestCase):
     '''Unit tests for the Blackjack player class'''
 
