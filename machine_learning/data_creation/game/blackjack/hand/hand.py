@@ -2,7 +2,6 @@ class Hand():
     def __init__(self, stake=0):
         self.cards = []
         self.stake = stake
-        self.active = True
 
     def __repr__(self):
         class_name = type(self).__name__
@@ -37,16 +36,3 @@ class Hand():
     def bust(self):
         '''Determine if the hand is worth more than 21.'''
         return self.value() > 21
-
-    def pair(self):
-        '''Determine if the hand is two cards the same.'''
-        return len(self.cards) == 2 and (self.cards[0].rank
-                                         == self.cards[-1].rank)
-
-    def split(self):
-        '''Split this hand into two hands if it can be split.'''
-        assert self.pair()
-        card = self.cards.pop()
-        hand = Hand(self.stake)
-        hand.add_card(card)
-        return hand

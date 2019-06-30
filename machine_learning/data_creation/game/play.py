@@ -6,7 +6,7 @@ def start_game():
     prompt = 'Please enter your name (default is "Player"): '
     name = input(prompt)
     if name == '':
-        name = 'Player'  # Remove these prints later
+        name = 'Player'
 
     chips = 1000
     return Game(name, chips)
@@ -27,7 +27,6 @@ def main():
                 break
             game.setup()
             game.check_for_blackjack()
-            # bots play hands
             game.play_hands()
 
     except KeyboardInterrupt:

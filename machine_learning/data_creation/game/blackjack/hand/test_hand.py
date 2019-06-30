@@ -88,19 +88,3 @@ class HandTestCase(TestCase):
         hand.add_card(Card('K'))
         hand.add_card(Card('7'))
         self.assertFalse(hand.bust())
-
-    def test_hand_split_pair(self):
-        card = Card('J')
-        hand = Hand()
-        hand.add_card(card)
-        hand.add_card(card)
-        new_hand = hand.split()
-        self.assertIsInstance(new_hand, Hand)
-        self.assertTrue(str(hand) == str(new_hand))
-
-    def test_hand_split_non_pair(self):
-        hand = Hand()
-        hand.add_card(Card('2'))
-        hand.add_card(Card('3'))
-        with self.assertRaises(AssertionError):
-            hand.split()
