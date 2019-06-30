@@ -15,7 +15,7 @@ class PersonTest(TestCase):
         hand_2.active = False
         person.hands = [hand_1, hand_2]
         self.assertTrue(person.has_active_hands())
-    
+
     def test_has_active_hands_false(self):
         person = Person("PlayerName")
         hand_1 = Hand(10)
@@ -35,7 +35,7 @@ class PersonTest(TestCase):
         self.assertEqual(next(result), hand_1)
         self.assertEqual(next(result), hand_2)
         self.assertEqual(next(result), hand_3)
-    
+
     def test_active_hands_status_change(self):
         '''Available hands should adjust by status'''
         person = Person("PlayerName")

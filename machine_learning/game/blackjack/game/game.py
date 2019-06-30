@@ -14,7 +14,7 @@ class Game():
         self.max_name_len = max(len(name), len('Dealer'))  # remove
         self.playing = False
         self.bot_players = list(BotPlayer(name) for name in ['Bot1', 'Bot2',
-                                'Bot3', 'Bot4', 'Bot5'])
+                                                             'Bot3'])
         self.dealer = None
 
     def _deal_card(self, name, hand, announce=True):
@@ -49,7 +49,6 @@ class Game():
 
     def format_text(self, name, text):
         '''Prefix output with player's name.'''
-        print(name)
         name = name.rjust(self.max_name_len)
         return '{} > {}'.format(name, text)
 
@@ -88,7 +87,7 @@ class Game():
             self.playing = False
             print()
             print(self.format_text('Dealer', 'scored blackjack : {}'
-                  .format(self.dealer)))
+                                   .format(self.dealer)))
             if self.player.hands[0].value() == self.dealer.value():
                 outcome = 'you scored blackjack as well.'
                 player.push(self.player.hands[0].stake)

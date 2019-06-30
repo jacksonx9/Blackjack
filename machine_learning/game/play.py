@@ -2,9 +2,7 @@ from blackjack.game.game import Game
 
 
 def start_game():
-    '''Obtain player names and starting chips'''
-    number_players = 6
-
+    '''Obtain player name and starting chips.'''
     prompt = 'Please enter your name (default is "Player"): '
     name = input(prompt)
     if name == '':
@@ -15,7 +13,7 @@ def start_game():
 
 
 def main():
-    '''Run the main game loop'''
+    '''Run the main game loop.'''
     try:
         print()
         game = start_game()
@@ -34,6 +32,7 @@ def main():
     finally:
         print('Thanks for playing.')
         print()
+
 
 if __name__ == '__main__':
     main()

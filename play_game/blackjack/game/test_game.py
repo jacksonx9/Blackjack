@@ -20,7 +20,7 @@ class GameTest(TestCase):
         names = 'p1 p2 p3'.split()
         game = Game(names, 100)
         self.assertEqual(game.max_name_len, len('Dealer'))
-    
+
     def test_init_max_name_len_calculated_player_name(self):
         names = 'p1 p2 p3 longname'.split()
         game = Game(names, 100)
@@ -53,13 +53,14 @@ class GameTest(TestCase):
         blue = '\x1b[34m'
         stop = '\x1b[0m'
         resp = game.format_text('foo', 'testing', 'blue')
-        test = '{}{} > {}{}'.format(blue, 'foo'.rjust(len('Dealer')), 'testing', stop)
+        test = '{}{} > {}{}'.format(
+            blue, 'foo'.rjust(len('Dealer')), 'testing', stop)
         self.assertEqual(resp, test)
 
     def test_players_with_chips(self):
         game = Game(['foo'], 100)
         self.assertTrue(game.players_with_chips())
-    
+
     def test_players_without_chips(self):
         game = Game(['foo'], 10)
         game.players[0].chips = 0
@@ -73,7 +74,7 @@ class GameTest(TestCase):
         self.assertEqual(next(result).name, 'p1')
         self.assertEqual(next(result).name, 'p2')
         self.assertEqual(next(result).name, 'p3')
-    
+
     def test_active_players_status_change(self):
         game = Game(['p1', 'p2', 'p3'], 100)
         for player in game.players:
@@ -87,7 +88,7 @@ class GameTest(TestCase):
         game = Game(['foo'], 100)
         game.players[0].hands.append(Hand(10))
         self.assertTrue(game.has_active_hands())
-    
+
     def test_has_active_hands_none_active(self):
         game = Game(['foo'], 100)
         game.players[0].hands.append(Hand(10))

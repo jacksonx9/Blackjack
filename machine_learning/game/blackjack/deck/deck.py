@@ -1,4 +1,5 @@
-import random, copy
+import random
+import copy
 
 from ..card.card import Card, RANK
 
@@ -14,7 +15,7 @@ class Deck():
 
     def __repr__(self):
         class_name = type(self).__name__
-        return '{}({})'.format(class_name, self._cards) 
+        return '{}({})'.format(class_name, self._cards)
 
     def __str__(self):
         return str(self._cards)

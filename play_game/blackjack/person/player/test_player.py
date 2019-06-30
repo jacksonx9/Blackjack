@@ -4,6 +4,7 @@ from .. import Card
 from .. import Hand
 from .player import Player
 
+
 class PlayerTest(TestCase):
     '''Unit tests for the Blackjack player class'''
 
@@ -11,19 +12,19 @@ class PlayerTest(TestCase):
         player = Player('PlayerName', 100)
         player.win(10, 1.5)
         self.assertEqual(player.chips, 125)
-        self.assertEqual(player.results['wins'], 1) # wins still here?
+        self.assertEqual(player.results['wins'], 1)  # wins still here?
 
     def test_loses_bet(self):
         player = Player('PlayerName', 100)
         player.loss()
         self.assertEqual(player.chips, 100)
-        self.assertEqual(player.results['losses'], 1) # wins still here?
+        self.assertEqual(player.results['losses'], 1)  # wins still here?
 
     def test_pushes_bet(self):
         player = Player('PlayerName', 100)
         player.push(10)
         self.assertEqual(player.chips, 110)
-        self.assertEqual(player.results['ties'], 1) # wins still here?
+        self.assertEqual(player.results['ties'], 1)  # wins still here?
 
     def test_can_bet(self):
         player = Player('PlayerName', 100)
@@ -59,7 +60,7 @@ class PlayerTest(TestCase):
         hand.add_card(Card('6', '♢'))
         hand.add_card(Card('8', '♤'))
         self.assertTrue(player.can_double_down(hand))
-    
+
     def test_double_down_sufficient_chips_3_cards(self):
         player = Player('PlayerName', 100)
         hand = Hand(50)
@@ -74,7 +75,7 @@ class PlayerTest(TestCase):
         hand.add_card(Card('7', '♡'))
         hand.add_card(Card('5', '♡'))
         hand.add_card(Card('3', '♤'))
-        self.assertFalse(player.can_double_down(hand)) 
+        self.assertFalse(player.can_double_down(hand))
 
     def test_split_hand_possible(self):
         player = Player('PlayerName', 100)
@@ -82,7 +83,7 @@ class PlayerTest(TestCase):
         hand.add_card(Card('Q', '♡'))
         hand.add_card(Card('Q', '♡'))
         self.assertTrue(player.can_split(hand))
-    
+
     def test_split_hand_3_cards(self):
         player = Player('PlayerName', 100)
         hand = Hand(50)
@@ -90,14 +91,14 @@ class PlayerTest(TestCase):
         hand.add_card(Card('J', '♡'))
         hand.add_card(Card('J', '♡'))
         self.assertFalse(player.can_split(hand))
-    
+
     def test_split_hand_insufficient_chips(self):
         player = Player('PlayerName', 100)
         hand = Hand(101)
         hand.add_card(Card('J', '♡'))
         hand.add_card(Card('J', '♡'))
         self.assertFalse(player.can_split(hand))
-    
+
     def test_has_chips_for_player_whole_stack(self):
         player = Player('PlayerName', 100)
         self.assertTrue(player.has_chips(99))

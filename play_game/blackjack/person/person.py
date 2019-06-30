@@ -4,10 +4,11 @@ from termcolor import COLORS
 SYSTEM_COLORS = ['grey', 'white']
 PLAYER_COLORS = list(c for c in COLORS.keys() if c not in SYSTEM_COLORS)
 
+
 class Person():
     '''Represents a player or the dealer in the game'''
 
-    def __init__(self, name, color='green'):        
+    def __init__(self, name, color='green'):
         assert color in PLAYER_COLORS
         self.name = name
         self.color = color

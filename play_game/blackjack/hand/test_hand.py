@@ -3,8 +3,9 @@ from unittest import TestCase
 from .hand import Hand
 from ..card.card import Card
 
+
 class HandTestCase(TestCase):
-    def test_hand_representation(self): 
+    def test_hand_representation(self):
         hand = Hand()
         hand.add_card(Card('K', '♧'))
         hand.add_card(Card('7', '♡'))
@@ -27,7 +28,7 @@ class HandTestCase(TestCase):
         hand.add_card(Card('A', '♤'))
         hand.add_card(Card('9', '♢'))
         self.assertEqual(hand.value(), 20)
-    
+
     def test_hand_value_soft_over_21(self):
         hand = Hand()
         hand.add_card(Card('A', '♤'))
@@ -47,14 +48,14 @@ class HandTestCase(TestCase):
         hand.add_card(Card('Q', '♢'))
         hand.add_card(Card('A', '♤'))
         self.assertTrue(hand.blackjack())
-    
+
     def test_hand_blackjack_too_many_cards(self):
         hand = Hand()
         hand.add_card(Card('Q', '♢'))
         hand.add_card(Card('5', '♡'))
         hand.add_card(Card('6', '♡'))
         self.assertFalse(hand.blackjack())
-    
+
     def test_hand_blackjack_not_21(self):
         hand = Hand()
         hand.add_card(Card('Q', '♢'))

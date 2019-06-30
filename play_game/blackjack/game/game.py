@@ -15,9 +15,10 @@ class Game():
         self.deck = Deck()
         self.deck.shuffle()
         self.colors = list(PLAYER_COLORS)
-        self.players = list(Player(name, chips, self.__get_color()) 
-            for name in names)
-        self.max_name_len = max(max(len(name) for name in names), len('Dealer'))
+        self.players = list(Player(name, chips, self.__get_color())
+                            for name in names)
+        self.max_name_len = max(max(len(name)
+                                    for name in names), len('Dealer'))
         self.playing = False
         self.dealer = None
 
@@ -49,7 +50,7 @@ class Game():
         while bet < minimum or bet > player.chips or bet % multiple != 0:
             bet = input(self.format_text(
                 player.name, 'enter amount ({}): '.format(minimum),
-                    player.color))
+                player.color))
             if bet == '':
                 bet = minimum
             else:
@@ -83,7 +84,7 @@ class Game():
         hands = []
         self.playing = True
         min_bet = 10
-        random.shuffle(self.players) # change to ai_players first then player
+        random.shuffle(self.players)  # change to ai_players first then player
         players = self.players_with_chips(min_bet)
         if not players:
             return
@@ -91,7 +92,7 @@ class Game():
         for player in players:
             player.insurance = 0
             bet = self._get_bet(player, 'How much would you like to bet?',
-                min_bet, 2)
+                                min_bet, 2)
             hand = Hand(bet)
             hands.append(hand)
             player.bet(bet)
@@ -107,7 +108,8 @@ class Game():
             hand = player.hands[0]
             prompt = 'hand dealt {:>2} : {}'.format(hand.value(), hand)
             print(self.format_text(player.name, prompt, player.color))
-        print(self.format_text('Dealer', 'face up card  : {}'.format(dealer.cards[0])))
+        print(self.format_text(
+            'Dealer', 'face up card  : {}'.format(dealer.cards[0])))
         self.dealer = dealer
 
     def check_for_dealer_blackjack(self):
@@ -118,13 +120,14 @@ class Game():
             self.playing = False
             print()
             print(self.format_text('Dealer', 'scored blackjack : {}'
-                .format(dealer)))
+                                   .format(dealer)))
             for player in players:
                 for hand in player.active_hands():
                     if hand.value() == dealer.value():
                         outcome = 'you scored blackjack as well.'
                         player.push(hand.stake)
-                        print(self.format_text(player.name, outcome, player.color))
+                        print(self.format_text(
+                            player.name, outcome, player.color))
 
     def check_for_player_blackjack(self):
         '''Check if any player has blackjack and settle bets accordingly'''
@@ -134,7 +137,7 @@ class Game():
             for hand in player.active_hands():
                 if hand.blackjack():
                     print(self.format_text(player.name, 'you scored blackjack!',
-                        player.color))
+                                           player.color))
                     self.settle_outcome(dealer, player, hand)
 
     def settle_outcome(self, dealer, player, hand):
@@ -210,11 +213,12 @@ class Game():
         players = sorted(self.players,
                          reverse=True,
                          key=lambda x: (x.chips,
-                                        x.results['wins']*3 + x.results['ties'],
+                                        x.results['wins']*3 +
+                                        x.results['ties'],
                                         -x.results['losses']))
         for player in players:
-            results = ',  '.join('{}: {:>2}'.format(k, v) for k, v in 
-                player.results.items())
+            results = ',  '.join('{}: {:>2}'.format(k, v) for k, v in
+                                 player.results.items())
             prompt = 'chips: {:>3},  {}'.format(player.chips, results)
             print(self.format_text(player.name, prompt, player.color))
 
@@ -242,7 +246,7 @@ class Game():
         while hand.active:
             if hand.twenty_one():
                 print(self.format_text(player.name, 'scored 21! :)',
-                    player.color))
+                                       player.color))
                 break
             if hand.bust():
                 self.bust(player, hand)

@@ -14,7 +14,7 @@ class Player():
     def has_active_hands(self):
         '''Does the player have any active hands?'''
         return list(h for h in self.hands if h.active)
-    
+
     def win(self, bet):
         '''Player wins at the odds provided'''
         assert bet > 0

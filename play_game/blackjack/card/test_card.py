@@ -5,10 +5,11 @@ from .card import Card
 class CardTest(TestCase):
     def test_init_valid_card(self):
         '''No error raised.'''
-        card = Card("6","♢")
-    
+        card = Card("6", "♢")
+
     def test_init_invalid_card(self):
-        with self.assertRaises(AssertionError): _ = Card("11","♧")
+        with self.assertRaises(AssertionError):
+            _ = Card("11", "♧")
 
     def test_stringify_one_digit(self):
         card = Card("A", "♢")
@@ -21,7 +22,7 @@ class CardTest(TestCase):
     def test_value_numeric(self):
         card = Card("2", "♤")
         self.assertEqual(card.value(), 2)
-    
+
     def test_value_face_card(self):
         card = Card("Q", "♡")
         self.assertEqual(card.value(), 10)
@@ -34,7 +35,7 @@ class CardTest(TestCase):
         card = Card("A", "♤")
         self.assertTrue(card.ace())
 
-    def test_ace_false(self):  
+    def test_ace_false(self):
         card = Card("9", "♡")
         self.assertFalse(card.ace())
 
@@ -42,6 +43,6 @@ class CardTest(TestCase):
         card = Card("K", "♤")
         self.assertTrue(card._face_card())
 
-    def test_face_card_false(self):  
+    def test_face_card_false(self):
         card = Card("9", "♡")
         self.assertFalse(card._face_card())

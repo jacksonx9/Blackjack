@@ -1,6 +1,7 @@
 RANK = [str(n) for n in range(2, 11)] + list('JQKA')
 SUIT = ('♡', '♢', '♧', '♤')
 
+
 class Card(object):
     '''Represents a playing card'''
 
@@ -13,8 +14,8 @@ class Card(object):
 
     def __repr__(self):
         class_name = type(self).__name__
-        return '{}({:>2}{})'.format(class_name, self.rank, self.suit) 
-    
+        return '{}({:>2}{})'.format(class_name, self.rank, self.suit)
+
     def __str__(self):
         return '{:>2}{}'.format(self.rank, self.suit)
 
