@@ -22,6 +22,9 @@ def main():
             if not game.player.has_chips(10):
                 print('No one with any chips remaining - game over')
                 break
+            if not game.sufficient_cards():
+                print('Insufficent card. Play another game.')
+                break
             game.setup()
             game.check_for_blackjack()
             # bots play hands

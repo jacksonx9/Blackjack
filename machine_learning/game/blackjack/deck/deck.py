@@ -7,8 +7,8 @@ from ..card.card import Card, RANK
 class Deck():
     '''Represents deck of 52 cards to be dealt to the player and dealer.'''
 
-    def __init__(self):
-        self._cards = [Card(rank) for rank in RANK] * 4
+    def __init__(self, num_decks=1):
+        self._cards = [Card(rank) for rank in RANK] * 4 * num_decks
 
     def __len__(self):
         return len(self._cards)

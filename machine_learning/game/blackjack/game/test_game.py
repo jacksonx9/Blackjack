@@ -23,9 +23,9 @@ class GameTest(TestCase):
         game._deal_card(game.player.name, hand)
         self.assertTrue(len(hand), 1)
 
-    def test_game_get_bet_min_bet(self):
+    def test_game_get_bet_default_min_bet(self):
         game = Game('', 100)
-        with mock.patch('builtins.input', return_value=10):
+        with mock.patch('builtins.input', return_value=''):
             bet = game._get_bet(10, 2)
             self.assertEqual(bet, 10)
 
@@ -36,29 +36,19 @@ class GameTest(TestCase):
             self.assertEqual(bet, 20)
 
     def test_game_format_text(self):
-        '''Format text produces desired output.'''
         game = Game('', 100)
-        stop = '\x1b[0m'
         resp = game.format_text('foo', 'testing')
         test = '{} > {}'.format('foo'.rjust(len('Dealer')), 'testing')
         self.assertEqual(resp, test)
 
-    def test_game_player_with_chips(self):
+    def test_game_sufficient_cards(self):
         game = Game('', 100)
-        self.assertTrue(game.player.has_chips())
+        for _ in range(52*6 - (len(game.bot_players) + 2)*10 - 1):
+            game.deck.next_card()
+        self.assertTrue(game.sufficient_cards())
 
-    def test_game_player_without_chips(self):
-        game = Game('', 10)
-        game.player.chips = 0
-        self.assertFalse(game.player.has_chips())
-
-    def test_game_has_active_hands_active_player(self):
+    def test_game_insufficient_cards(self):
         game = Game('', 100)
-        game.player.hands.append(Hand(10))
-        self.assertTrue(game.player.has_active_hands())
-
-    def test_game_player_has_active_hands_none_active(self):
-        game = Game('', 100)
-        game.player.hands.append(Hand(10))
-        game.player.hands[0].active = False
-        self.assertFalse(game.player.has_active_hands())
+        for _ in range(52*6 - (len(game.bot_players) + 2)*10):
+            game.deck.next_card()
+        self.assertFalse(game.sufficient_cards())

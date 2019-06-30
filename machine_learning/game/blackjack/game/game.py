@@ -7,14 +7,13 @@ from .. import Player, BotPlayer, Hand, Deck
 class Game():
     '''Controls the actions of the game'''
 
-    def __init__(self, name, chips):
-        self.deck = Deck()
+    def __init__(self, name, chips, num_decks=6):
+        self.deck = Deck(num_decks)
         self.deck.shuffle()
         self.player = Player(name, chips)
         self.max_name_len = max(len(name), len('Dealer'))  # remove
         self.playing = False
-        self.bot_players = list(BotPlayer(name) for name in ['Bot1', 'Bot2',
-                                                             'Bot3'])
+        self.bot_players = list(BotPlayer(name) for name in ['Bot1', 'Bot2'])
         self.dealer = None
 
     def _deal_card(self, name, hand, announce=True):
@@ -57,9 +56,6 @@ class Game():
         self.playing = True
         min_bet = 10
 
-        if not self.player.has_chips(min_bet):
-            return
-
         bet = self._get_bet(min_bet, 2)
         self.player.bet(bet)
         self.player.hands = [Hand(bet)]
@@ -90,7 +86,7 @@ class Game():
                                    .format(self.dealer)))
             if self.player.hands[0].value() == self.dealer.value():
                 outcome = 'you scored blackjack as well.'
-                player.push(self.player.hands[0].stake)
+                self.player.push(self.player.hands[0].stake)
                 print(self.format_text(player.name, outcome))
                 return
 
@@ -111,19 +107,19 @@ class Game():
             outcome = 'you lost to the dealer :('
         print(self.format_text(self.player.name, outcome))
 
-    def split_hand(self, player, hand):
+    def split_hand(self, hand):
         '''Split player's hand if possible'''
         if hand.pair() and player.has_chips(hand.stake):
             prompt = 'would you like to split your pair? (Y/n): '
-            prompt = self.format_text(player.name, prompt)
+            prompt = self.format_text(self.player.name, prompt)
             resp = self.get_response(prompt, ('Y', 'N'), 'Y')
             if resp == 'Y':
                 new_hand = hand.split()
-                player.bet(hand.stake)
-                self._deal_card(player.name, hand)
-                self._deal_card(player.name, new_hand)
-                player.hands.append(new_hand)
-                self.show_hand(player.name, hand)
+                self.player.bet(hand.stake)
+                self._deal_card(self.player.name, hand)
+                self._deal_card(self.player.name, new_hand)
+                self.player.hands.append(new_hand)
+                self.show_hand(self.player.name, hand)
 
     def hit(self, player, hand):
         '''Draw another card for player and determine outcome.'''
@@ -183,7 +179,7 @@ class Game():
         '''Play the hand until finished'''
         self.show_hand(self.player.name, hand)
         if self.player.can_split(hand):
-            self.split_hand(self.player, hand)
+            self.split_hand(hand)
 
         while hand.active:
             if hand.twenty_one():
@@ -216,3 +212,7 @@ class Game():
             if resp in accepted:
                 break
         return resp
+
+    def sufficient_cards(self):
+        '''Determines if sufficient cards to play another round.'''
+        return len(self.deck) > (len(self.bot_players) + 2) * 10
