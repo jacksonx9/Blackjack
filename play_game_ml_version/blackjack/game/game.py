@@ -48,14 +48,20 @@ class Game():
         name = name.rjust(self.max_name_len)
         return '{} > {}'.format(name, text)
 
-    def setup(self):
-        '''Obtain bets and deal two cards to the player and the dealer.'''
-        self.playing = True
+    def draw_player_hand(self):
         min_bet = 10
 
         bet = self._get_bet(min_bet, 2)
         self.player.bet(bet)
         self.player.hand = Hand(bet)
+
+        for _ in range(2):
+            self._deal_card(_, self.player.hand, announce=False)
+
+    def setup(self):
+        '''Obtain bets and deal two cards to the player and the dealer.'''
+        self.playing = True
+
         self.dealer = Hand()
         for bot in self.bot_players:
             bot.hand = Hand()
@@ -64,7 +70,6 @@ class Game():
             for bot in self.bot_players:
                 self._deal_card(_, bot.hand, announce=False)
             self._deal_card(_, self.dealer, announce=False)
-            self._deal_card(_, self.player.hand, announce=False)
         print()
         for bot in self.bot_players:
             prompt = 'hand dealt {:>2} : {}'.format(bot.hand.value(), bot.hand)
@@ -157,6 +162,12 @@ class Game():
             self.play_hand(self.player.hand)
             if self.playing:
                 self.dealer_turn()
+
+    def compute_hands(self, hits):
+        self.bots_turn()
+        self.compute_hand(self.player.hand, hits)
+        if self.playing:
+            self.dealer_turn()
 
     def play_hand(self, hand):
         '''Play the hand until finished'''

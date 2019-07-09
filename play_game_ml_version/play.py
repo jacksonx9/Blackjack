@@ -25,6 +25,7 @@ def main():
             if not game.sufficient_cards():
                 print('Insufficent card. Play another game.')
                 break
+            game.draw_player_hand()
             game.setup()
             game.check_for_blackjack()
             game.play_hands()

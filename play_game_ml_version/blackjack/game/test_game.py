@@ -36,25 +36,12 @@ class GameTest(TestCase):
         with mock.patch('builtins.input', return_value=20):
             bet = game._get_bet(10, 2)
             self.assertEqual(bet, 20)
-    
+
     def test_game_format_text(self):
         game = Game('', 100)
         resp = game.format_text('foo', 'testing')
         test = '{} > {}'.format('foo'.rjust(len('Dealer')), 'testing')
         self.assertEqual(resp, test)
-
-    def test_game_setup(self):
-        game = Game('', 100)
-        org_num_cards = len(game.deck)
-        with mock.patch('builtins.input', return_value=20):
-            game.setup()
-        self.assertEqual(2, len(game.player.hand))
-        self.assertEqual(2, len(game.dealer))
-        for bot in game.bot_players:
-            self.assertEqual(2, len(bot.hand))
-        num_bots = len(game.bot_players)
-        post_num_cards = len(game.deck)
-        self.assertEqual(org_num_cards - 4 - 2*num_bots, post_num_cards)
 
     def test_game_check_for_blackjack_player_and_dealer_blackjack(self):
         game = Game('Player', 100)
@@ -68,7 +55,7 @@ class GameTest(TestCase):
             game.check_for_blackjack()
         self.assertFalse(game.playing)
         mock.assert_called_once_with(10)
-    
+
     def test_game_check_for_blackjack_player_blackjack(self):
         game = Game('Player', 100)
         game.dealer = Hand()
