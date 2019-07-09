@@ -5,6 +5,7 @@ __pycache__/
 .coverage
 .coveragerc
 htmlcov/
+octave-workspace
 
 dist/
 .vscode
