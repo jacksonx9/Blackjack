@@ -16,6 +16,12 @@ class Hand():
     def add_card(self, card):
         self.cards.append(card)
 
+    def remove_card(self):
+        self.cards.pop()
+
+    def num_aces(self):
+        return sum(1 for c in self.cards if c.ace())
+
     def value(self):
         '''Calculate the value of the hand. Aces can be 11 or 1.'''
         aces = sum(1 for c in self.cards if c.ace())

@@ -1,66 +1,69 @@
 import numpy as np
 import scipy.io as sio
 
-from collections import Iterable
+from collections.abc import Iterable
 from os import path
 
-from .data_game import DataGame
-from .enum_outcome import Outcome
+from data_game import DataGame
+from enum_outcome import Outcome
 
 
 class Generate():
     '''
     Creates and stores data in this format:
-    | hand_value | num_aces | dealer_card | H/s | win/loss | 2s | 3s |...
+    y = | WIN/TIE/LOSS |
+    X = | dealer_card | pre_hit_hand_value | player_aces | Hit/Stand | 2s | 3s |...
      4s | 5s | 6s | 7s | 8s | 9s | 10JQKs | As |
     '''
+    data_row_num_elem = 13
 
-    def __init__(self):
+    def __init__(self, rounds):
         self.data_file = 'blackjack_data.mat'
+        self.result = []
+        self.data = []
 
     def run(self):
-        pass
+        self.play_round(1)
+        result_np = np.array(self.result).reshape(-1, 1)
+        data_np = np.array(self.data).reshape(-1, Generate.data_row_num_elem)
+        result_rows, _ = np.shape(result_np)
+        data_rows, _ = np.shape(data_np)
+        # print("result length {}: {}".format(len(self.result), self.result))
+        # print("data length {}: {}".format(len(self.data)/13, self.data))
+        # print("result_rows: {}, data_rows: {}".format(result_rows, data_rows))
+        assert result_rows == data_rows
+        sio.savemat(self.data_file, {'X': data_np, 'y': result_np})
 
     def play_round(self, player_hits):
+        game = DataGame(6*52)
+        game.deal_initial_cards()
         for _ in range(10):
-            game = DataGame(6*52)
+            game.reset_initial_cards()
+            game.deck.shuffle()
             (win, dealer_init_val, player_val_pre_last_hit,
-                player_val_final, cards_layout) = game.play(player_hits)
-            
+                player_aces, cards_layout) = game.play(player_hits)
+
             if win == Outcome.INVALID:
                 continue
 
-    def _reset_cards(self):
-        pass
+            self._save_data(win, dealer_init_val, player_val_pre_last_hit,
+                            player_aces, cards_layout)
 
-    def _create_mat_file(self):
-        if not path.exists("blackjack_data.mat"):
-            vect = np.arange(10)
-            vect.reshape(10,)
-            sio.savemat('blackjack_data.mat', {'vect': vect})
+    def _save_data(self, win, dealer_init_val, player_val_pre_last_hit,
+                   player_val_final, cards_layout):
+        self.result.append(win.value)
+        self.data += self._flatten((dealer_init_val, player_val_pre_last_hit,
+                                    player_val_final, cards_layout))
 
-    def _add_data_to_mat_file(self, data):
-        # sort data
-        # hand value, has ace
-        # https://github.com/scipy/scipy/issues/2967
-        pass
-
-    def _player_hand_value(self):
-        hand = self.game.player.hand
-
-    def _player_number_of_aces(self):
-        hand = self.game.player.hand
-
-    def _remaining_cards(self):
-        deck = self.game.deck
-        # number of cards for each value
-
-    def flatten(items):
-        for x in items:
-            if isinstance(x, tuple) or isinstance(x, Iterable):
-                yield from flatten(x)
+    def _flatten(self, items):
+        result = []
+        for item in items:
+            if isinstance(item, tuple) or isinstance(item, Iterable):
+                result += [elem for elem in item]
             else:
-                yield x
+                result.append(item)
+
+        return result
 
     def _loading_bar(self):
         pass
@@ -105,3 +108,12 @@ for i, item in enumerate(items):
     printProgressBar(i + 1, l, prefix = 'Progress:', suffix = 'Complete',
                     length = 50)
     '''
+
+
+def main():
+    g = Generate(1)
+    g.run()
+
+
+if __name__ == '__main__':
+    main()

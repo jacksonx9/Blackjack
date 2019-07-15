@@ -1,7 +1,7 @@
 import random
 
-from .components import Hand, Deck
-from .enum_outcome import Outcome
+from components import Hand, Deck
+from enum_outcome import Outcome
 
 
 class DataGame():
@@ -27,7 +27,6 @@ class DataGame():
             player_hits: The number of times the player will hit.
         '''
         self.valid_data = True
-        self._deal_initial_cards()
         cards_layout = self.deck.card_divide()
         dealer_init_val = self.dealer.value()
         player_val_pre_last_hit = self._play(player_hits)
@@ -35,33 +34,26 @@ class DataGame():
             # busted before drawing last card
             return (Outcome.INVALID, 0, 0, 0, 0)
 
-        player_val_final = self.player.value()
+        player_aces = self.player.num_aces()
         win = self._outcome()
 
         return (win, dealer_init_val, player_val_pre_last_hit,
-                player_val_final, cards_layout)
-    
-    def play_without_initial_deals(self, player_hits):
-        self.valid_data = True
-        cards_layout = self.deck.card_divide()
-        dealer_init_val = self.dealer.value()
-        player_val_pre_last_hit = self._play(player_hits)
-        if not self.valid_data:
-            return False  # busted before drawing last card
+                player_aces, cards_layout)
 
-        player_val_final = self.player.value()
-        win = self._outcome()
+    def reset_initial_cards(self):
+        while len(self.player) > 2:
+            self.player.remove_card()
 
-        return (win, dealer_init_val, player_val_pre_last_hit,
-                player_val_final, cards_layout)
+        while len(self.dealer) > 1:
+            self.dealer.remove_card()
 
-    def _deal_initial_cards(self):
+    def deal_initial_cards(self):
         self.player = Hand()
         self._deal_card(self.player)
         self._deal_card(self.player)
         self.dealer = Hand()
         self._deal_card(self.dealer)
-    
+
     def _remove_uninitial_cards(self):
         while (len(self.player) > 2):
             self.player.cards.pop()
@@ -78,7 +70,8 @@ class DataGame():
 
     def _play(self, player_hits):
         player_value_pre_last_hit = self._player_turn(player_hits)
-        if self._bust(self.player):
+
+        if player_value_pre_last_hit > 21:
             self.valid_data = False
             return
 
@@ -106,7 +99,6 @@ class DataGame():
 
     def _bust(self, hand):
         '''Determine if the hand is worth more than 21.'''
-        print(hand.value())
         return hand.value() > 21
 
     def _dealer_turn(self, player_hits):
@@ -116,7 +108,9 @@ class DataGame():
             curr_deck_idx += 1
 
     def _outcome(self):
-        if (self.player.value() > self.dealer.value() or
+        if self._bust(self.player):
+            return Outcome.LOSS
+        elif (self.player.value() > self.dealer.value() or
                 self._bust(self.dealer)):
             return Outcome.WIN
         elif self.player.value() == self.dealer.value():
