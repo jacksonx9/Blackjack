@@ -6,3 +6,8 @@ class Outcome(Enum):
     TIE = 1
     LOSS = 0
     INVALID = -1
+
+
+class Move(Enum):
+    STAND = 0
+    HIT = 1

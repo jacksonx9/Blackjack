@@ -5,25 +5,26 @@ from collections.abc import Iterable
 from os import path
 
 from data_game import DataGame
-from enum_outcome import Outcome
+from enums import Outcome, Move
 
 
 class Generate():
     '''
     Creates and stores data in this format:
     y = | WIN/TIE/LOSS |
-    X = | dealer_card | pre_hit_hand_value | player_aces | Hit/Stand | 2s | 3s |...
-     4s | 5s | 6s | 7s | 8s | 9s | 10JQKs | As |
+    X = | Hit/Stand | dealer_card | pre_hit_hand_value | player_aces |
+        2s | 3s |4s | 5s | 6s | 7s | 8s | 9s | 10JQKs | As |
     '''
-    data_row_num_elem = 13
+    data_row_num_elem = 14
 
-    def __init__(self, rounds):
+    def __init__(self):
         self.data_file = 'blackjack_data.mat'
         self.result = []
         self.data = []
+        self.game = None
 
     def run(self):
-        self.play_round(1)
+        self.play()
         result_np = np.array(self.result).reshape(-1, 1)
         data_np = np.array(self.data).reshape(-1, Generate.data_row_num_elem)
         result_rows, _ = np.shape(result_np)
@@ -34,30 +35,39 @@ class Generate():
         assert result_rows == data_rows
         sio.savemat(self.data_file, {'X': data_np, 'y': result_np})
 
-    def play_round(self, player_hits):
-        game = DataGame(6*52)
-        game.deal_initial_cards()
+    def play(self):
+        self.game = DataGame(6*52)
+        self.game.deal_initial_cards()
+
         for _ in range(10):
-            game.reset_initial_cards()
-            game.deck.shuffle()
-            (win, dealer_init_val, player_val_pre_last_hit,
-                player_aces, cards_layout) = game.play(player_hits)
+            self._play_round()
 
-            if win == Outcome.INVALID:
-                continue
+    def _play_round(self):
+        self.game.reset_initial_cards()
+        self.game.deck.shuffle()
 
-            self._save_data(win, dealer_init_val, player_val_pre_last_hit,
-                            player_aces, cards_layout)
+        self._action(Move.STAND)
+        self._action(Move.HIT)
 
-    def _save_data(self, win, dealer_init_val, player_val_pre_last_hit,
+    def _action(self, move):
+        (win, dealer_init_val, player_val_pre_last_hit,
+            player_aces, cards_layout) = self.game.play(move)
+
+        if win == Outcome.INVALID:
+            return
+
+        self._save_data(win, move.value, dealer_init_val, player_val_pre_last_hit,
+                        player_aces, cards_layout)
+
+    def _save_data(self, win, move, dealer_init_val, player_val_pre_last_hit,
                    player_val_final, cards_layout):
         self.result.append(win.value)
-        self.data += self._flatten((dealer_init_val, player_val_pre_last_hit,
-                                    player_val_final, cards_layout))
+        self.data += self._flatten(move, dealer_init_val, player_val_pre_last_hit,
+                                   player_val_final, cards_layout)
 
-    def _flatten(self, items):
+    def _flatten(self, *args):
         result = []
-        for item in items:
+        for item in args:
             if isinstance(item, tuple) or isinstance(item, Iterable):
                 result += [elem for elem in item]
             else:
@@ -65,12 +75,8 @@ class Generate():
 
         return result
 
-    def _loading_bar(self):
-        pass
-        # https://docs.scipy.org/doc/scipy/reference/tutorial/io.html
-
-    def printProgressBar(iteration, total, prefix='', suffix='', decimals=1,
-                         length=100, fill='█'):
+    def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1,
+                           length=100, fill='█'):
         """
         Call in a loop to create terminal progress bar
         @params:
@@ -111,7 +117,7 @@ for i, item in enumerate(items):
 
 
 def main():
-    g = Generate(1)
+    g = Generate()
     g.run()
 
 

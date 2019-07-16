@@ -1,7 +1,7 @@
 import random
 
 from components import Hand, Deck
-from enum_outcome import Outcome
+from enums import Outcome, Move
 
 
 class DataGame():
@@ -20,22 +20,18 @@ class DataGame():
         self.deck.shuffle()
         self.deck.set_total_cards(num_cards)
 
-    def play(self, player_hits):
-        '''Run the possible outcome of the hands.
-
-        Args:
-            player_hits: The number of times the player will hit.
-        '''
+    def play(self, move):
+        '''Run the possible outcome of the hands.'''
         self.valid_data = True
         cards_layout = self.deck.card_divide()
         dealer_init_val = self.dealer.value()
-        player_val_pre_last_hit = self._play(player_hits)
+        player_val_pre_last_hit = self._play_round(move)
         if not self.valid_data:
             # busted before drawing last card
             return (Outcome.INVALID, 0, 0, 0, 0)
 
         player_aces = self.player.num_aces()
-        win = self._outcome()
+        win = self.outcome(self.player.value())
 
         return (win, dealer_init_val, player_val_pre_last_hit,
                 player_aces, cards_layout)
@@ -68,52 +64,41 @@ class DataGame():
         card = self.deck.card_at(deck_index)
         hand.add_card(card)
 
-    def _play(self, player_hits):
-        player_value_pre_last_hit = self._player_turn(player_hits)
+    def _play_round(self, move):
+        post_cards_dealt = 0
+        player_value = self.player.value()
 
-        if player_value_pre_last_hit > 21:
+        if move == Move.HIT:
+            self._deal_card_copy(self.player, post_cards_dealt)
+            post_cards_dealt += 1
+        
+        print("Player: {}".format(self.player))
+        
+        if player_value > 21:
             self.valid_data = False
             return
 
-        self._dealer_turn(player_hits)
+        self._dealer_turn(post_cards_dealt)
+        print("Dealer: {}".format(self.dealer))
+        return player_value
 
-        return player_value_pre_last_hit
-
-    def _player_turn(self, player_hits):
-        '''Players turn to .
-
-        Args:
-            player_hits: The number of times the player will hit.
-                         Must be greater than or equal to 0.
-        '''
-        assert player_hits >= 0
-        if player_hits == 0:
-            player_value_pre_last_hit = self.player.cards[0].value()
-
-        for hit in range(player_hits):
-            if hit == player_hits - 1:  # Value before last card dealt
-                player_value_pre_last_hit = self.player.value()
-            self._deal_card_copy(self.player, hit)
-
-        return player_value_pre_last_hit
-
-    def _bust(self, hand):
+    def _bust(self, hand_value):
         '''Determine if the hand is worth more than 21.'''
-        return hand.value() > 21
+        return hand_value > 21
 
-    def _dealer_turn(self, player_hits):
-        curr_deck_idx = player_hits
+    def _dealer_turn(self, post_cards_dealt):
+        curr_deck_idx = post_cards_dealt
         while self.dealer.value() <= 17:
             self._deal_card_copy(self.dealer, curr_deck_idx)
             curr_deck_idx += 1
 
-    def _outcome(self):
-        if self._bust(self.player):
+    def outcome(self, player_value):
+        dealer_value = self.dealer.value()
+        if self._bust(player_value):
             return Outcome.LOSS
-        elif (self.player.value() > self.dealer.value() or
-                self._bust(self.dealer)):
+        elif (player_value > dealer_value or self._bust(player_value)):
             return Outcome.WIN
-        elif self.player.value() == self.dealer.value():
+        elif player_value == dealer_value:
             return Outcome.TIE
         else:
             return Outcome.LOSS
