@@ -71,15 +71,15 @@ class DataGame():
         if move == Move.HIT:
             self._deal_card_copy(self.player, post_cards_dealt)
             post_cards_dealt += 1
-        
-        print("Player: {}".format(self.player))
-        
+
+        # print("Player: {}".format(self.player))
+
         if player_value > 21:
             self.valid_data = False
             return
 
         self._dealer_turn(post_cards_dealt)
-        print("Dealer: {}".format(self.dealer))
+        # print("Dealer: {}".format(self.dealer))
         return player_value
 
     def _bust(self, hand_value):

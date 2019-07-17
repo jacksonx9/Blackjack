@@ -2,10 +2,10 @@ import numpy as np
 import scipy.io as sio
 
 from collections.abc import Iterable
-from os import path
 
 from data_game import DataGame
 from enums import Outcome, Move
+from progress_bar import ProgressBar
 
 
 class Generate():
@@ -39,10 +39,13 @@ class Generate():
         self.game = DataGame(6*52)
         self.game.deal_initial_cards()
 
-        for _ in range(10):
-            self._play_round()
+        progress_bar_prefix = 'Generate Data: '
+        tot_iterations = 50
+        for iteration in range(tot_iterations):
+            self._play_round(iteration, tot_iterations, progress_bar_prefix)
 
-    def _play_round(self):
+    @ProgressBar.print_bar
+    def _play_round(self, iteration, tot_iterations, prefix):
         self.game.reset_initial_cards()
         self.game.deck.shuffle()
 
@@ -74,47 +77,6 @@ class Generate():
                 result.append(item)
 
         return result
-
-    def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1,
-                           length=100, fill='█'):
-        """
-        Call in a loop to create terminal progress bar
-        @params:
-            iteration   - Required  : current iteration (Int)
-            total       - Required  : total iterations (Int)
-            prefix      - Optional  : prefix string (Str)
-            suffix      - Optional  : suffix string (Str)
-            decimals    - Optional  : positive number of decimals in percent
-                                      complete (Int)
-            length      - Optional  : character length of bar (Int)
-            fill        - Optional  : bar fill character (Str)
-        """
-        percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration /
-                                                                float(total)))
-        filledLength = int(length * iteration // total)
-        bar = fill * filledLength + '-' * (length - filledLength)
-        print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end='\r')
-        # Print New Line on Complete
-        if iteration == total:
-            print()
-
-        '''
-        from time import sleep
-
-# A List of Items
-items = list(range(0, 57))
-l = len(items)
-
-# Initial call to print 0% progress
-printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
-for i, item in enumerate(items):
-    # Do stuff...
-    sleep(0.1)
-    # Update Progress Bar
-    printProgressBar(i + 1, l, prefix = 'Progress:', suffix = 'Complete',
-                    length = 50)
-    '''
-
 
 def main():
     g = Generate()
