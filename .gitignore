@@ -6,6 +6,7 @@ __pycache__/
 .coveragerc
 htmlcov/
 octave-workspace
+blackjack_data.mat
 
 dist/
 .vscode
