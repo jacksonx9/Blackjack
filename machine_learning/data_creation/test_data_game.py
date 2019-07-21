@@ -108,7 +108,7 @@ class DataGameTest(TestCase):
         game.dealer.add_card(dealer_card)
         outcome = game.outcome(game.player.value())
         self.assertEqual(Outcome.LOSS, outcome)
-    
+
     def test_data_game_outcome_win(self):
         whole_deck = 52*6
         game = DataGame(whole_deck)

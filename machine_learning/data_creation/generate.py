@@ -18,20 +18,22 @@ class Generate():
     data_row_num_elem = 14
 
     def __init__(self):
-        self.data_file = 'blackjack_data.mat'
+        self.data_file = './logistic_regression/blackjack_data.mat'
         self.result = []
         self.data = []
         self.game = None
 
     def run(self):
         self.play()
-        result_np = np.array(self.result).reshape(-1, 1)
-        data_np = np.array(self.data).reshape(-1, Generate.data_row_num_elem)
+        result_np = np.array(self.result, dtype=np.double).reshape(-1, 1)
+        data_np = np.array(
+            self.data, dtype=np.double).reshape(-1, Generate.data_row_num_elem)
         result_rows, _ = np.shape(result_np)
         data_rows, _ = np.shape(data_np)
         # print("result length {}: {}".format(len(self.result), self.result))
         # print("data length {}: {}".format(len(self.data)/13, self.data))
-        # print("result_rows: {}, data_rows: {}".format(result_rows, data_rows))
+        # print("result_rows: {}, data_rows: {}".format(result_rows,
+        #                                               data_rows))
         assert result_rows == data_rows
         sio.savemat(self.data_file, {'X': data_np, 'y': result_np})
 
@@ -42,15 +44,17 @@ class Generate():
         rep_per_deck_len = 10
         for deck_len in range(max_deck_len, min_deck_len, -1):
             iteration = tot_iterations - deck_len + min_deck_len + 1
-            self._play_rounds(iteration, tot_iterations, progress_bar_prefix, rep_per_deck_len, deck_len)
+            self._play_rounds(iteration, tot_iterations,
+                              progress_bar_prefix, rep_per_deck_len, deck_len)
 
     @ProgressBar.print_bar
-    def _play_rounds(self, iteration, tot_iterations, prefix, repetitions, deck_len):
+    def _play_rounds(self, iteration, tot_iterations, prefix, repetitions,
+                     deck_len):
         for iteration in range(repetitions):
-                self.game = DataGame(deck_len)
-                self.game.deal_initial_cards()
-                for _ in range(tot_iterations):
-                    self._play_round()
+            self.game = DataGame(deck_len)
+            self.game.deal_initial_cards()
+            for _ in range(tot_iterations):
+                self._play_round()
 
     def _play_round(self):
         self.game.reset_initial_cards()
@@ -66,14 +70,15 @@ class Generate():
         if win == Outcome.INVALID:
             return
 
-        self._save_data(win, move.value, dealer_init_val, player_val_pre_last_hit,
-                        player_aces, cards_layout)
+        self._save_data(win, move.value, dealer_init_val,
+                        player_val_pre_last_hit, player_aces, cards_layout)
 
     def _save_data(self, win, move, dealer_init_val, player_val_pre_last_hit,
                    player_val_final, cards_layout):
         self.result.append(win.value)
-        self.data += self._flatten(move, dealer_init_val, player_val_pre_last_hit,
-                                   player_val_final, cards_layout)
+        self.data += self._flatten(move, dealer_init_val,
+                                   player_val_pre_last_hit, player_val_final,
+                                   cards_layout)
 
     def _flatten(self, *args):
         result = []

@@ -22,7 +22,7 @@ class HandTestCase(TestCase):
         card = Card('9')
         hand.add_card(card)
         self.assertEqual(len(hand), 1)
-    
+
     def test_hand_remove_card(self):
         hand = Hand()
         card = Card('9')
@@ -37,7 +37,7 @@ class HandTestCase(TestCase):
         hand.add_card(card1)
         hand.add_card(card2)
         self.assertEqual(1, hand.num_aces())
-    
+
     def test_hand_value_soft_less_than_21(self):
         hand = Hand()
         hand.add_card(Card('A'))
