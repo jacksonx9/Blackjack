@@ -1,7 +1,7 @@
 import random
 
-from components import Hand, Deck
-from enums import Outcome, Move
+from .enums import Outcome, Move
+from .components import Hand, Deck
 
 
 class DataGame():
@@ -50,12 +50,6 @@ class DataGame():
         self.dealer = Hand()
         self._deal_card(self.dealer)
 
-    def _remove_uninitial_cards(self):
-        while (len(self.player) > 2):
-            self.player.cards.pop()
-        while (len(self.dealer) > 1):
-            self.dealer.cards.pop()
-
     def _deal_card(self, hand):
         card = self.deck.next_card()
         hand.add_card(card)
@@ -96,7 +90,7 @@ class DataGame():
         dealer_value = self.dealer.value()
         if self._bust(player_value):
             return Outcome.LOSS
-        elif (player_value > dealer_value or self._bust(player_value)):
+        elif (player_value > dealer_value or self._bust(dealer_value)):
             return Outcome.WIN
         elif player_value == dealer_value:
             return Outcome.TIE

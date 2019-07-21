@@ -3,9 +3,9 @@ import scipy.io as sio
 
 from collections.abc import Iterable
 
-from data_game import DataGame
-from enums import Outcome, Move
-from progress_bar import ProgressBar
+from .data_game import DataGame
+from .enums import Outcome, Move
+from .progress_bar import ProgressBar
 
 
 class Generate():
@@ -77,11 +77,3 @@ class Generate():
                 result.append(item)
 
         return result
-
-def main():
-    g = Generate()
-    g.run()
-
-
-if __name__ == '__main__':
-    main()
