@@ -36,16 +36,23 @@ class Generate():
         sio.savemat(self.data_file, {'X': data_np, 'y': result_np})
 
     def play(self):
-        self.game = DataGame(6*52)
-        self.game.deal_initial_cards()
-
         progress_bar_prefix = 'Generate Data: '
-        tot_iterations = 50
-        for iteration in range(tot_iterations):
-            self._play_round(iteration, tot_iterations, progress_bar_prefix)
+        max_deck_len, min_deck_len = 6 * 52, 20
+        tot_iterations = max_deck_len - min_deck_len
+        rep_per_deck_len = 10
+        for deck_len in range(max_deck_len, min_deck_len, -1):
+            iteration = tot_iterations - deck_len + min_deck_len + 1
+            self._play_rounds(iteration, tot_iterations, progress_bar_prefix, rep_per_deck_len, deck_len)
 
     @ProgressBar.print_bar
-    def _play_round(self, iteration, tot_iterations, prefix):
+    def _play_rounds(self, iteration, tot_iterations, prefix, repetitions, deck_len):
+        for iteration in range(repetitions):
+                self.game = DataGame(deck_len)
+                self.game.deal_initial_cards()
+                for _ in range(tot_iterations):
+                    self._play_round()
+
+    def _play_round(self):
         self.game.reset_initial_cards()
         self.game.deck.shuffle()
 
