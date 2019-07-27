@@ -39,9 +39,9 @@ class Generate():
 
     def play(self):
         progress_bar_prefix = 'Generate Data: '
-        max_deck_len, min_deck_len = 6 * 52, 20
+        max_deck_len, min_deck_len = 3*52, 20
         tot_iterations = max_deck_len - min_deck_len
-        rep_per_deck_len = 10
+        rep_per_deck_len = 100
         for deck_len in range(max_deck_len, min_deck_len, -1):
             iteration = tot_iterations - deck_len + min_deck_len + 1
             self._play_rounds(iteration, tot_iterations,

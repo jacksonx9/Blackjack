@@ -11,7 +11,7 @@ clear ; close all; clc
 fprintf('Loading and Visualizing Data ...\n')
 
 load('blackjack_data.mat'); % training data stored in arrays X, y
-num_labels = 3;
+num_labels = 2;
 # m = size(X, 1);
 
 % Randomly select 100 data points to display
@@ -36,7 +36,7 @@ lambda_t = 3;
 fprintf('\nCost: %f\n', J);
 
 fprintf('Program paused. Press enter to continue.\n');
-pause;
+% pause;
 
 %% =============== One-vs-All Training ===============
 
@@ -46,7 +46,7 @@ lambda = 0.1;
 [all_theta] = oneVsAll(X, y, num_labels, lambda);
 
 fprintf('Program paused. Press enter to continue.\n');
-pause;
+% pause;
 
 
 %% =================== Predict for One-Vs-All ===================

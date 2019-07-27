@@ -90,9 +90,7 @@ class DataGame():
         dealer_value = self.dealer.value()
         if self._bust(player_value):
             return Outcome.LOSS
-        elif (player_value > dealer_value or self._bust(dealer_value)):
+        elif (player_value >= dealer_value or self._bust(dealer_value)):
             return Outcome.WIN
-        elif player_value == dealer_value:
-            return Outcome.TIE
         else:
             return Outcome.LOSS
