@@ -2,18 +2,41 @@
 
 > Standard game of blackjack with 1 deck and up to 6 players.
 
-![](https://github.com/jacksonx9/Blackjack/blob/master/photos%20%2B%20gifs/blackjack_play_game_example)
+### Run Game
+
+```shell
+python play_game_regularized_version/play.py
+```
+
+### Machine Learning
+
+#### Generate Data
+
+```shell
+python machine_learning/run.py 
+```
+
+#### Train Model
+
+```shell
+cd machine_learning/logistic_regression
+octave
+```
+
+```octave
+run
+```
+
+### Project Demo
 
 ![](https://github.com/jacksonx9/Blackjack/blob/master/photos%20%2B%20gifs/create_data_blackjack.gif)
 
-#### Run Game
+![](https://github.com/jacksonx9/Blackjack/blob/master/photos%20%2B%20gifs/blackjack_play_game_example)
 
-```shell
-python play_game/play.py
-```
+### Game Cycle
 
-#### Game Cycle
 Collect names of players and their starting chip balance then cycle through game process:
+
 1. deal initial cards
 2. check dealer blackjack
 3. for each player’s hand:
@@ -23,16 +46,3 @@ Collect names of players and their starting chip balance then cycle through game
    4. show results and settle bets
 
 When game is complete show results for each player and their balance.
-
-#### Run Tests
-
-```shell
-python -m unittest discover blackjack 
-coverage report -m
-
-```
-
-#### Machine Learning
-
-coming soon…
-
