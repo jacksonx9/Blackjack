@@ -1,6 +1,6 @@
-# Blackjack
+# Blackjack AI
 
-> Standard game of blackjack with 1 deck and up to 6 players.
+> Game of blackjack with 6 decks and up to 6 players. 
 
 ### Run Game
 
@@ -16,7 +16,7 @@ python play_game_regularized_version/play.py
 python machine_learning/run.py 
 ```
 
-#### Train Model
+#### Logistic Regression
 
 ```shell
 cd machine_learning/logistic_regression
