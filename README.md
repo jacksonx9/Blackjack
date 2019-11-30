@@ -1,4 +1,4 @@
-# Blackjack AI
+# Blackjack Machine Learning
 
 > Game of blackjack with 6 decks and up to 6 players. 
 
@@ -13,19 +13,18 @@ python play_game_regularized_version/play.py
 #### Generate Data
 
 ```shell
-python machine_learning/run.py 
+python machine_learning/v2/run.py 
 ```
 
 #### Logistic Regression
 
 ```shell
-cd machine_learning/logistic_regression
+cd machine_learning/v2/logistic_regression
 octave
-```
-
-```octave
 run
 ```
+
+Accuracy of 93.8% whether the player should hit or stand
 
 ### Project Demo
 
